@@ -267,7 +267,7 @@ The campaign stays paused through every row above. Delivery stays 0 until the ow
 | `prototype/index.html` | The clickable workspace |
 | `doc/Cheerio-Assist-Assignment-A.pdf` | The written answer, 3 pages |
 | `doc/Cheerio-Assist-Prompt-Log.pdf` | Prompts that changed the work, and the one that didn’t |
-| `Cheerio-Assist-Cost-Model.xlsx` | Volume, cost, billing, roadmap, audit. Blue cells are inputs |
+| `Cheerio-Assist-Cost-Model.xlsx` | Volume, cost, billing, roadmap, audit. Blue cells are inputs. The same workbook, shared with anyone who has the link: https://docs.google.com/spreadsheets/d/175zDen-vQv8dJx1no4NeMVFcEd0V_YPtqqi8Jti4Jvg/edit?usp=sharing |
 | `model/build_cost_model.py` | Rebuilds the workbook |
 | `screenshots/` | The four screens of the Diwali path |
 
