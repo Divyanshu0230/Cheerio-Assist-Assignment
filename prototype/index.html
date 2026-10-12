@@ -513,6 +513,7 @@
     const name = document.getElementById("tplName").value.trim() || "diwali_weekend_offer";
     if (state.reason === "charge") {
       return {
+        kicker: "Ticket TCK-4419",
         title: "Billing has the ₹840",
         body: "Divyanshu, this is with billing. You don’t need to write it again. Growth includes a person on email, and the calls already on your plan. The Diwali campaign stays paused.",
         preview: "Ticket TCK-4419\nQueue: Billing\nWorkspace: Hotel Amar · Growth · Divyanshu\nAsk: the ₹840 debit on 2 Oct, CAM-1790, 1,188 marketing messages delivered\nDiwali weekend rooms CAM-1842 delivered 0 and was not charged\nBalance was not changed"
@@ -520,6 +521,7 @@
     }
     if (state.reason === "second") {
       return {
+        kicker: "Ticket TCK-4418",
         title: "Templates has both rejections",
         body: "We stopped after one guided resubmit. Someone on templates will reply by email. The campaign stays paused and no guest has been messaged.",
         preview: "Ticket TCK-4418\nQueue: Templates\nWorkspace: Hotel Amar · Growth · Divyanshu\nTemplate: " + name + "\nAttempt 1 rejected: name, category, empty variable\nAttempt 2 rejected: offer wording\nCampaign CAM-1842 paused · 0 delivered"
@@ -529,6 +531,7 @@
       ? "You already resubmitted " + name + " as Marketing. The campaign is still paused."
       : "You have not applied the fix yet. The three reasons are on the ticket.";
     return {
+      kicker: "Ticket TCK-4418",
       title: "Templates has the rejection",
       body: did + " Someone will reply by email. Guests have not been messaged.",
       preview: "Ticket TCK-4418\nQueue: Templates\nWorkspace: Hotel Amar · Growth · Divyanshu\nCampaign CAM-1842 failed, 0 delivered\nTemplate Diwali Offer rejected\nCauses: name, Utility on a discount, blank {{1}}\n" + did
@@ -537,6 +540,7 @@
 
   function paintReceipt() {
     const copy = receiptCopy();
+    document.getElementById("receiptKicker").textContent = copy.kicker;
     document.getElementById("receiptTitle").textContent = copy.title;
     document.getElementById("receiptBody").textContent = copy.body;
     document.getElementById("receiptPreview").textContent = copy.preview;
