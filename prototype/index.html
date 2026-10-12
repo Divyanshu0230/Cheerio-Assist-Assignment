@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cheerio · Hotel Amar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1c1915;
+    --muted: #6f685f;
+    --faint: #a39b90;
+    --line: #e6dfd4;
+    --paper: #f4f0e8;
+    --card: #fffcf8;
+    --sidebar: #101714;
+    --side: #d7e3db;
+    --side-dim: #8aa396;
+    --green: #0d6a4c;
+    --green-dark: #084232;
+    --green-soft: #e5f4ee;
+    --fail: #a33b22;
+    --fail-soft: #fde7e0;
+    --amber: #8a5a12;
+    --amber-soft: #f8efd8;
+    --shadow: 0 1px 0 rgba(28, 25, 21, 0.04), 0 12px 32px rgba(40, 28, 16, 0.05);
+    --sans: "Instrument Sans", "Avenir Next", sans-serif;
+    --serif: "Instrument Serif", Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { font-family: var(--sans); color: var(--ink); background: var(--paper); letter-spacing: -0.015em; }
+  button, input { font-family: inherit; color: inherit; }
+  button { cursor: pointer; }
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  .side {
+    background: var(--sidebar);
+    color: var(--side);
+    padding: 22px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .brand { display: flex; gap: 10px; align-items: center; padding: 0 8px 22px; }
+  .mark {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: linear-gradient(160deg, #1f8f68, #0c5c40);
+    display: grid; place-items: center; color: white; font-weight: 700;
+  }
+  .brand b { display: block; font-size: 16px; letter-spacing: -0.03em; }
+  .brand span { color: var(--side-dim); font-size: 12px; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left; background: transparent; color: var(--side);
+    border: 0; border-radius: 10px; padding: 10px 12px; font-size: 14.5px; font-weight: 500;
+  }
+  .nav-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .nav-btn.on, .nav-btn:hover { background: rgba(255,255,255,0.06); }
+  .nav-btn .count {
+    margin-left: auto; background: #a33b22; color: white; border-radius: 99px;
+    font-size: 11px; padding: 1px 6px; font-weight: 600;
+  }
+  .side .grow { flex: 1; }
+  .me {
+    display: flex; gap: 10px; align-items: center;
+    margin: 8px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,0.04);
+  }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: #1f8f68;
+    display: grid; place-items: center; font-weight: 700; font-size: 13px; color: white;
+  }
+  .me strong { display: block; font-size: 13.5px; }
+  .me span { color: var(--side-dim); font-size: 12px; }
+  main { padding: 22px 28px 48px; min-width: 0; }
+  .view { display: none; }
+  body[data-screen="campaigns"] #campaigns,
+  body[data-screen="templates"] #templates,
+  body[data-screen="workflows"] #workflows,
+  body[data-screen="wallet"] #wallet,
+  body[data-screen="diagnosis"] #diagnosis,
+  body[data-screen="review"] #review,
+  body[data-screen="pending"] #pending,
+  body[data-screen="second"] #second,
+  body[data-screen="charge"] #charge,
+  body[data-screen="receipt"] #receipt { display: block; }
+  .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 18px; }
+  h1 { font-family: var(--serif); font-size: 34px; font-weight: 400; letter-spacing: -0.03em; margin: 0; }
+  .sub { color: var(--muted); margin: 4px 0 0; font-size: 14.5px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .stat, .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow);
+  }
+  .stat { padding: 14px 16px; }
+  .stat .k { color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+  .stat .n { font-size: 26px; font-weight: 650; letter-spacing: -0.04em; margin-top: 4px; }
+  .stat .n.bad { color: var(--fail); }
+  .layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.8fr); gap: 14px; align-items: start; }
+  .tools { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .search, .field {
+    border: 1px solid var(--line); background: white; border-radius: 10px; padding: 9px 12px; font-size: 14px;
+  }
+  .search { flex: 1; }
+  .chip {
+    border: 1px solid var(--line); background: transparent; border-radius: 99px; padding: 7px 12px; font-size: 13px; font-weight: 550;
+  }
+  .chip.on { background: var(--ink); color: white; border-color: var(--ink); }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); font-weight: 600; padding: 0 12px 8px; }
+  td { padding: 14px 12px; border-top: 1px solid var(--line); vertical-align: middle; font-size: 14.5px; }
+  tr.fail td { background: #fff7f4; }
+  .name { font-weight: 600; }
+  .meta { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .pill { display: inline-flex; border-radius: 99px; padding: 3px 8px; font-size: 12px; font-weight: 650; }
+  .pill.bad { background: var(--fail-soft); color: var(--fail); }
+  .pill.ok { background: var(--green-soft); color: var(--green-dark); }
+  .pill.wait { background: var(--amber-soft); color: var(--amber); }
+  .btn {
+    border: 0; background: var(--green); color: white; border-radius: 10px; padding: 10px 14px;
+    font-weight: 600; font-size: 14px;
+  }
+  .btn:disabled { background: #cfc6b8; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn.small { padding: 8px 12px; }
+  .rail { padding: 16px; }
+  .kicker { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); font-weight: 700; margin-bottom: 8px; }
+  .rail h2 { font-family: var(--serif); font-size: 26px; font-weight: 400; margin: 0 0 8px; }
+  .rail p, .card p { color: var(--muted); line-height: 1.45; font-size: 14.5px; }
+  .linkish { background: none; border: 0; color: var(--green-dark); font-weight: 650; padding: 8px 0; font-size: 14px; }
+  .split { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 14px; align-items: start; }
+  .card { padding: 18px 18px 16px; }
+  .fact { display: grid; grid-template-columns: 150px 1fr; gap: 8px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+  .fact span { color: var(--muted); }
+  .timeline { margin-top: 8px; }
+  .step { display: grid; grid-template-columns: 16px 1fr; gap: 10px; }
+  .step .dot { width: 10px; height: 10px; border-radius: 50%; background: #cfc6b8; margin-top: 4px; }
+  .step.bad .dot { background: var(--fail); }
+  .step.ok .dot { background: var(--green); }
+  .step .line { width: 1px; background: var(--line); height: 18px; margin-left: 4px; }
+  .reason { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .num {
+    width: 26px; height: 26px; border-radius: 50%; background: var(--green-soft); color: var(--green-dark);
+    display: grid; place-items: center; font-weight: 700; flex: none;
+  }
+  .reason strong { font-weight: 650; }
+  .reason p { margin: 3px 0 0; }
+  .raw {
+    font-family: ui-monospace, "SF Mono", monospace; font-size: 12.5px; line-height: 1.55;
+    background: #f6f1e8; border-radius: 10px; padding: 12px 14px; color: #4e473f; margin-top: 10px;
+    white-space: pre-wrap;
+  }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .review { display: grid; grid-template-columns: 0.9fr 1.05fr 270px; gap: 14px; align-items: start; }
+  label { display: block; font-size: 12.5px; color: var(--muted); margin: 12px 0 6px; }
+  .field { width: 100%; }
+  .choices { display: flex; gap: 8px; }
+  .choice { border: 1px solid var(--line); background: white; border-radius: 10px; padding: 9px 12px; font-weight: 600; }
+  .choice.on { border-color: var(--green); background: var(--green-soft); color: var(--green-dark); }
+  .warn { background: var(--fail-soft); color: var(--fail); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; line-height: 1.4; margin-top: 10px; }
+  .phone { background: #0e1c17; border-radius: 28px; padding: 14px 12px 18px; color: white; }
+  .phone .bar { display: flex; justify-content: space-between; font-size: 11px; color: #b7c7be; margin-bottom: 12px; }
+  .wa { background: #075e54; border-radius: 14px 14px 0 0; padding: 10px 12px; font-weight: 650; font-size: 13px; }
+  .bubble { background: #d8f6c8; color: #14241c; margin: 12px 8px 0 36px; border-radius: 12px 12px 4px 12px; padding: 10px 12px; font-size: 13.5px; line-height: 1.4; }
+  .bubble .cta { margin-top: 8px; background: white; color: #075e54; text-align: center; border-radius: 8px; padding: 6px; font-weight: 700; font-size: 13px; }
+  .old .bubble { background: #ece7df; color: #5c564c; }
+  .strike { text-decoration: line-through; }
+  .hero { max-width: 720px; }
+  .hidden { display: none !important; }
+  .empty { padding: 28px 12px; color: var(--muted); }
+  @media (max-width: 1100px) {
+    .app { grid-template-columns: 1fr; }
+    .side { position: relative; height: auto; }
+    .stats, .layout, .split, .review { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body data-screen="campaigns">
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="mark">C</div>
+      <div><b>cheerio</b><span>Hotel Amar · Jaipur</span></div>
+    </div>
+    <button class="nav-btn on" data-go="campaigns" data-nav="campaigns">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      Campaigns <span class="count">1</span>
+    </button>
+    <button class="nav-btn" data-go="templates" data-nav="templates">
+      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg>
+      Templates
+    </button>
+    <button class="nav-btn" data-go="workflows" data-nav="workflows">
+      <svg viewBox="0 0 24 24"><path d="M7 7h4v4H7zM13 13h4v4h-4zM11 9h2M15 13v-2"/></svg>
+      Workflows
+    </button>
+    <button class="nav-btn" data-go="wallet" data-nav="wallet">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+      Wallet
+    </button>
+    <div class="grow"></div>
+    <div class="me">
+      <div class="avatar">D</div>
+      <div><strong>Divyanshu</strong><span>Owner · Growth</span></div>
+    </div>
+  </aside>
+  <main>
+    <section class="view" id="campaigns">
+      <div class="top">
+        <div>
+          <h1>Campaigns</h1>
+          <p class="sub">WhatsApp · +91 141 400 2200 · one send needs you</p>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">This month</div><div class="n">3</div></div>
+        <div class="stat"><div class="k">Failed</div><div class="n bad">1</div></div>
+        <div class="stat"><div class="k">Delivered</div><div class="n">1,274</div></div>
+        <div class="stat"><div class="k">Wallet</div><div class="n">₹6,420</div></div>
+      </div>
+      <div class="layout">
+        <div class="card" style="padding: 16px;">
+          <div class="tools">
+            <input class="search" id="q" placeholder="Search campaigns" />
+            <button class="chip on" data-filter="all">All</button>
+            <button class="chip" data-filter="failed">Failed</button>
+            <button class="chip" data-filter="sent">Sent</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Campaign</th><th>People</th><th>Delivered</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="rows">
+              <tr class="fail" data-camp="failed">
+                <td><div class="name">Diwali weekend rooms</div><div class="meta">CAM-1842 · template Diwali Offer · today, 9:14 am</div></td>
+                <td>1,240</td><td>0</td>
+                <td><span class="pill bad">Failed</span></td>
+                <td><button class="btn small" data-go="diagnosis">Fix this send</button></td>
+              </tr>
+              <tr data-camp="sent">
+                <td><div class="name">Monsoon rates</div><div class="meta">CAM-1790 · 2 Oct · marketing</div></td>
+                <td>1,240</td><td>1,188</td>
+                <td><span class="pill ok">Sent</span></td>
+                <td><button class="btn ghost small" data-go="charge">₹840</button></td>
+              </tr>
+              <tr data-camp="sent">
+                <td><div class="name">Booking confirmed</div><div class="meta">Utility · yesterday</div></td>
+                <td>86</td><td>86</td>
+                <td><span class="pill ok">Sent</span></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="empty hidden" id="none">Nothing matches.</div>
+        </div>
+        <div class="card rail">
+          <div class="kicker">Needs you</div>
+          <h2>Diwali didn’t send.</h2>
+          <p>1,240 guests were selected. None of them got the message. The template behind it was rejected by Meta.</p>
+          <div class="fact"><span>Template</span><b>Diwali Offer</b></div>
+          <div class="fact"><span>Category</span><b>Utility</b></div>
+          <div class="fact"><span>Charged for this</span><b>₹0</b></div>
+          <div class="actions">
+            <button class="btn" data-go="diagnosis">Open Assist</button>
+            <button class="btn ghost" data-go="templates">See the template</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="templates">
+      <button class="linkish" data-go="campaigns">← Campaigns</button>
+      <div class="top"><div><h1>Templates</h1><p class="sub">Meta has to approve a template before a campaign can use it.</p></div></div>
+      <div class="card" style="padding: 8px 8px 4px;">
+        <table>
+          <thead><tr><th>Name</th><th>Category</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr class="fail">
+              <td><div class="name">Diwali Offer</div><div class="meta">Space and capital letters</div></td>
+              <td>Utility</td>
+              <td><span class="pill bad">Rejected</span></td>
+              <td><button class="btn small" data-go="diagnosis">Why it failed</button></td>
+            </tr>
+            <tr>
+              <td><div class="name">booking_confirmed</div><div class="meta">Used yesterday</div></td>
+              <td>Utility</td>
+              <td><span class="pill ok">Approved</span></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td><div class="name">monsoon_rates</div><div class="meta">CAM-1790</div></td>
+              <td>Marketing</td>
+              <td><span class="pill ok">Approved</span></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="view" id="workflows">
+      <button class="linkish" data-go="campaigns">← Campaigns</button>
+      <div class="top"><div><h1>Workflows</h1><p class="sub">The failure this morning is the campaign. This workflow is on, and its template is approved.</p></div></div>
+      <div class="card" style="padding:16px 18px;">
+        <div class="name">After a booking</div>
+        <p class="meta">Sends booking_confirmed · toggle on · 86 runs last night</p>
+        <div style="margin-top:12px;"><span class="pill ok">On</span></div>
+      </div>
+    </section>
+
+    <section class="view" id="wallet">
+      <button class="linkish" data-go="campaigns">← Campaigns</button>
+      <div class="top"><div><h1>Wallet</h1><p class="sub">Balance ₹6,420. Assist can explain a line. It cannot move money.</p></div></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Balance</div><div class="n">₹6,420</div></div>
+        <div class="stat"><div class="k">October spend</div><div class="n">₹840</div></div>
+        <div class="stat"><div class="k">Diwali send</div><div class="n">₹0</div></div>
+        <div class="stat"><div class="k">Plan</div><div class="n" style="font-size:22px;">Growth</div></div>
+      </div>
+      <div class="card" style="padding:8px;">
+        <table>
+          <thead><tr><th>Line</th><th>When</th><th>Amount</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="name">Monsoon rates</div><div class="meta">1,188 marketing messages delivered · CAM-1790</div></td>
+              <td>2 Oct</td><td>₹840</td>
+              <td><button class="btn small" data-go="charge">Ask Assist</button></td>
+            </tr>
+            <tr>
+              <td><div class="name">Diwali weekend rooms</div><div class="meta">Not sent · CAM-1842</div></td>
+              <td>Today</td><td>₹0</td>
+              <td><button class="btn ghost small" data-go="diagnosis">Open the failure</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="view" id="diagnosis">
+      <button class="linkish" data-go="campaigns">← Campaigns</button>
+      <div class="split" style="margin-top:8px;">
+        <div class="card">
+          <div class="kicker">CAM-1842</div>
+          <h1 style="font-size:36px;">This campaign did not send</h1>
+          <p class="sub">Diwali weekend rooms · 1,240 guests · failed at 9:14 am</p>
+          <div class="fact"><span>Template</span><b>Diwali Offer</b></div>
+          <div class="fact"><span>From Meta</span><b>Rejected</b></div>
+          <div class="fact"><span>Guests reached</span><b>None</b></div>
+          <div class="fact"><span>Wallet</span><b>Not touched</b></div>
+          <div class="timeline">
+            <div class="step ok"><div><div class="dot"></div><div class="line"></div></div><div><b>Audience saved</b><div class="meta">1,240 guests · last night</div></div></div>
+            <div class="step ok"><div><div class="dot"></div><div class="line"></div></div><div><b>Template submitted</b><div class="meta">Diwali Offer · Utility</div></div></div>
+            <div class="step bad"><div><div class="dot"></div><div class="line"></div></div><div><b>Meta rejected it</b><div class="meta">Name, category, empty variable</div></div></div>
+            <div class="step bad"><div><div class="dot"></div></div><div><b>Send failed</b><div class="meta">Today, 9:14 am · 0 delivered</div></div></div>
+          </div>
+          <div class="raw">Stored from Meta: name must be lowercase with no spaces. Content does not match UTILITY. Variable {{1}} has no example.</div>
+        </div>
+        <div class="card">
+          <div class="kicker">Assist</div>
+          <h2 style="font-family:var(--serif); font-size:30px; font-weight:400; margin:0 0 8px;">Three things will keep getting rejected</h2>
+          <p>I can prepare a fix. Your guests will not get a message from this, and the wallet stays as it is.</p>
+          <div class="reason"><div class="num">1</div><div><strong>The name is “Diwali Offer”.</strong><p>Meta only accepts lowercase letters, numbers, and underscores. A space stops the review.</p></div></div>
+          <div class="reason"><div class="num">2</div><div><strong>You marked it Utility. The text is a discount.</strong><p>Utility is for something the guest already expects, like a booking confirmation. “20% off this weekend” is an offer, so the category is Marketing. Marketing costs more per message. That price is Meta’s.</p></div></div>
+          <div class="reason"><div class="num">3</div><div><strong>{{1}} has no example.</strong><p>Meta rejects a variable it cannot read. An example is a made-up name, not someone from your guest list.</p></div></div>
+          <div class="actions">
+            <button class="btn" data-go="review">Review the fix</button>
+            <button class="btn ghost" data-go="receipt" data-reason="diagnosis">Talk to a person</button>
+          </div>
+          <button class="linkish" data-go="charge">Why was I charged ₹840?</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="review">
+      <button class="linkish" data-go="diagnosis">← Diagnosis</button>
+      <div class="top"><div><h1>Review the fix</h1><p class="sub">Nothing goes to Meta until you press the button. The 1,240 guests are not on this step.</p></div></div>
+      <div class="review">
+        <div class="card old">
+          <div class="kicker">Now</div>
+          <div class="fact"><span>Name</span><b class="strike">Diwali Offer</b></div>
+          <div class="fact"><span>Category</span><b class="strike">Utility</b></div>
+          <div class="fact"><span>{{1}}</span><b class="strike">Empty</b></div>
+          <div class="phone" style="margin-top:16px; background:#24312c;">
+            <div class="bar"><span>What Meta rejected</span><span>9:02</span></div>
+            <div class="bubble">Hi {{1}}, flat 20% off this weekend. Book now.<div class="cta">Book</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="kicker">After</div>
+          <label for="tplName">Template name</label>
+          <input class="field" id="tplName" value="diwali_weekend_offer" />
+          <label>Category</label>
+          <div class="choices">
+            <button class="choice on" id="catMkt" type="button">Marketing</button>
+            <button class="choice" id="catUtil" type="button">Utility</button>
+          </div>
+          <label for="example">Example for {{1}}, the guest’s name</label>
+          <input class="field" id="example" value="Aman" />
+          <div id="block" class="warn hidden"></div>
+          <p class="meta" style="margin-top:12px;">This asks Meta to review the template again. The campaign stays paused either way.</p>
+          <div class="actions">
+            <button class="btn" id="apply">Resubmit to Meta</button>
+            <button class="btn ghost" data-go="receipt" data-reason="review">Talk to a person</button>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="bar"><span>Hotel Amar</span><span>preview</span></div>
+          <div class="wa">Hotel Amar</div>
+          <div class="bubble"><span id="previewText">Hi Aman, Hotel Amar has 20% off weekend stays this Diwali. Reply YES and we will hold a room until 8 pm.</span><div class="cta">Check dates</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="pending">
+      <div class="card hero">
+        <div class="kicker">With Meta</div>
+        <h1>diwali_weekend_offer is pending</h1>
+        <p class="sub">We’ll email divyanshu@hotelamar.in when Meta approves it or rejects it. Diwali weekend rooms is still paused. Nobody has been messaged.</p>
+        <div class="fact"><span>Category</span><b>Marketing</b></div>
+        <div class="fact"><span>Guests</span><b>Still 0</b></div>
+        <div class="fact"><span>Wallet</span><b>Unchanged</b></div>
+        <div class="actions">
+          <button class="btn" data-go="campaigns">Back to campaigns</button>
+          <button class="btn ghost" data-go="second">Meta rejected it again</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="second">
+      <div class="split">
+        <div class="card">
+          <div class="kicker">Second rejection</div>
+          <h1>I won’t submit another edit</h1>
+          <p class="sub">Meta rejected diwali_weekend_offer again. This note is about the offer itself, not the format. Another resubmit from here wastes the review.</p>
+          <div class="raw">First note: name, category, missing example. Those were corrected.<br>Second note: the offer needs a real end date and a way to opt out. That needs a person on the wording.</div>
+        </div>
+        <div class="card">
+          <div class="kicker">Assist</div>
+          <p>A person on templates should take it from here. They’ll get both notes, the version you already submitted, and the fact that the campaign never sent.</p>
+          <div class="actions">
+            <button class="btn" data-go="receipt" data-reason="second">Hand this over</button>
+            <button class="btn ghost" data-go="campaigns">Leave it paused</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="charge">
+      <button class="linkish" data-go="wallet">← Wallet</button>
+      <div class="split" style="margin-top:8px;">
+        <div class="card">
+          <div class="kicker">2 Oct</div>
+          <h1>Why was I charged ₹840?</h1>
+          <div class="fact"><span>Campaign</span><b>Monsoon rates · CAM-1790</b></div>
+          <div class="fact"><span>Delivered</span><b>1,188 marketing messages</b></div>
+          <div class="fact"><span>Diwali weekend rooms</span><b>₹0 · not sent</b></div>
+        </div>
+        <div class="card">
+          <div class="kicker">Assist</div>
+          <p>The ₹840 is Monsoon rates. Those messages were delivered. Diwali weekend rooms is not in that debit.</p>
+          <p>I can’t reverse it, move the balance, or promise a refund. If you want someone in billing to look at it, the campaign id goes with the ticket.</p>
+          <div class="actions">
+            <button class="btn" data-go="receipt" data-reason="charge">Pass this to billing</button>
+            <button class="btn ghost" data-go="diagnosis">Back to the failed send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="receipt">
+      <div class="card hero">
+        <div class="kicker" id="receiptKicker">Ticket TCK-4418</div>
+        <h1 id="receiptTitle">Templates has this</h1>
+        <p class="sub" id="receiptBody"></p>
+        <div class="raw" id="receiptPreview"></div>
+        <div class="actions">
+          <button class="btn" data-go="campaigns">Back to campaigns</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+  const state = { screen: "campaigns", category: "MARKETING", reason: "diagnosis", submitted: false, filter: "all" };
+  const screens = ["campaigns","templates","workflows","wallet","diagnosis","review","pending","second","charge","receipt"];
+  const navFor = { diagnosis:"campaigns", review:"campaigns", pending:"campaigns", second:"campaigns", charge:"wallet", receipt:"campaigns" };
+
+  function problems() {
+    const name = document.getElementById("tplName").value.trim();
+    const example = document.getElementById("example").value.trim();
+    const list = [];
+    if (!/^[a-z0-9_]+$/.test(name)) list.push("Use lowercase letters, numbers, and underscores only. diwali_weekend_offer passes.");
+    if (state.category !== "MARKETING") list.push("Utility can’t carry this offer. Meta will reject it again. Marketing matches a discount.");
+    if (!example) list.push("Add an example for the guest’s name. Meta rejects an empty variable.");
+    return list;
+  }
+
+  function refreshReview() {
+    const list = problems();
+    const block = document.getElementById("block");
+    const apply = document.getElementById("apply");
+    const example = document.getElementById("example").value.trim() || "…";
+    document.getElementById("previewText").textContent = "Hi " + example + ", Hotel Amar has 20% off weekend stays this Diwali. Reply YES and we will hold a room until 8 pm.";
+    document.getElementById("catMkt").classList.toggle("on", state.category === "MARKETING");
+    document.getElementById("catUtil").classList.toggle("on", state.category === "UTILITY");
+    if (list.length) { block.classList.remove("hidden"); block.textContent = list[0]; apply.disabled = true; }
+    else { block.classList.add("hidden"); apply.disabled = false; }
+  }
+
+  function receiptCopy() {
+    const name = document.getElementById("tplName").value.trim() || "diwali_weekend_offer";
+    if (state.reason === "charge") {
+      return {
+        title: "Billing has the ₹840",
+        body: "Divyanshu, this is with billing. You don’t need to write it again. Growth includes a person on email, and the calls already on your plan. The Diwali campaign stays paused.",
+        preview: "Ticket TCK-4419\nQueue: Billing\nWorkspace: Hotel Amar · Growth · Divyanshu\nAsk: the ₹840 debit on 2 Oct, CAM-1790, 1,188 marketing messages delivered\nDiwali weekend rooms CAM-1842 delivered 0 and was not charged\nBalance was not changed"
+      };
+    }
+    if (state.reason === "second") {
+      return {
+        title: "Templates has both rejections",
+        body: "We stopped after one guided resubmit. Someone on templates will reply by email. The campaign stays paused and no guest has been messaged.",
+        preview: "Ticket TCK-4418\nQueue: Templates\nWorkspace: Hotel Amar · Growth · Divyanshu\nTemplate: " + name + "\nAttempt 1 rejected: name, category, empty variable\nAttempt 2 rejected: offer wording\nCampaign CAM-1842 paused · 0 delivered"
+      };
+    }
+    const did = state.submitted
+      ? "You already resubmitted " + name + " as Marketing. The campaign is still paused."
+      : "You have not applied the fix yet. The three reasons are on the ticket.";
+    return {
+      title: "Templates has the rejection",
+      body: did + " Someone will reply by email. Guests have not been messaged.",
+      preview: "Ticket TCK-4418\nQueue: Templates\nWorkspace: Hotel Amar · Growth · Divyanshu\nCampaign CAM-1842 failed, 0 delivered\nTemplate Diwali Offer rejected\nCauses: name, Utility on a discount, blank {{1}}\n" + did
+    };
+  }
+
+  function paintReceipt() {
+    const copy = receiptCopy();
+    document.getElementById("receiptTitle").textContent = copy.title;
+    document.getElementById("receiptBody").textContent = copy.body;
+    document.getElementById("receiptPreview").textContent = copy.preview;
+  }
+
+  function applyFilter() {
+    const q = document.getElementById("q").value.trim().toLowerCase();
+    let shown = 0;
+    document.querySelectorAll("#rows tr").forEach((row) => {
+      const okStatus = state.filter === "all" || row.dataset.camp === state.filter;
+      const okQuery = !q || row.innerText.toLowerCase().includes(q);
+      const show = okStatus && okQuery;
+      row.classList.toggle("hidden", !show);
+      if (show) shown += 1;
+    });
+    document.getElementById("none").classList.toggle("hidden", shown !== 0);
+  }
+
+  function go(screen, reason) {
+    if (reason) state.reason = reason;
+    if (!screens.includes(screen)) return;
+    state.screen = screen;
+    document.body.dataset.screen = screen;
+    const nav = navFor[screen] || screen;
+    document.querySelectorAll(".nav-btn").forEach((btn) => btn.classList.toggle("on", btn.dataset.nav === nav));
+    if (screen === "review") refreshReview();
+    if (screen === "receipt") paintReceipt();
+    window.scrollTo(0, 0);
+  }
+
+  document.body.addEventListener("click", (event) => {
+    const filter = event.target.closest("[data-filter]");
+    if (filter) {
+      state.filter = filter.dataset.filter;
+      document.querySelectorAll("[data-filter]").forEach((chip) => chip.classList.toggle("on", chip === filter));
+      applyFilter();
+      return;
+    }
+    const btn = event.target.closest("[data-go]");
+    if (!btn) return;
+    go(btn.dataset.go, btn.dataset.reason || null);
+  });
+
+  document.getElementById("q").addEventListener("input", applyFilter);
+  document.getElementById("catMkt").addEventListener("click", () => { state.category = "MARKETING"; refreshReview(); });
+  document.getElementById("catUtil").addEventListener("click", () => { state.category = "UTILITY"; refreshReview(); });
+  document.getElementById("tplName").addEventListener("input", refreshReview);
+  document.getElementById("example").addEventListener("input", refreshReview);
+  document.getElementById("apply").addEventListener("click", () => {
+    if (problems().length) return;
+    state.submitted = true;
+    state.reason = "review";
+    go("pending");
+  });
+  go("campaigns");
+</script>
+</body>
+</html>

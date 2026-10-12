@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Cheerio Assist — Divyanshu</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+  @page { size: A4; margin: 12mm 14mm 13mm 14mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Source Sans 3", sans-serif; color: #1c1916; font-size: 10.35pt; line-height: 1.34; }
+  h1 { font-size: 18pt; line-height: 1.15; margin: 0 0 2px; letter-spacing: -0.02em; }
+  h2 { font-size: 12pt; margin: 11px 0 3px; color: #0b3d2c; break-after: avoid; page-break-after: avoid; }
+  p { margin: 0 0 6px; }
+  ol { margin: 2px 0 6px; padding-left: 18px; }
+  li { margin: 0 0 4px; }
+  .kicker { font-size: 9pt; letter-spacing: 0.08em; text-transform: uppercase; color: #0f6a4c; font-weight: 700; margin: 0; }
+  .who { font-size: 10pt; color: #5c564c; margin: 0 0 8px; }
+  table { width: 100%; border-collapse: collapse; margin: 4px 0 8px; font-size: 9.4pt; }
+  th, td { text-align: left; vertical-align: top; padding: 3px 6px; border-bottom: 1px solid #e6dfd4; }
+  th { font-size: 8.5pt; letter-spacing: 0.04em; text-transform: uppercase; color: #6f685f; }
+  .end { margin-top: 8px; font-size: 8.7pt; color: #5c564c; }
+</style>
+</head>
+<body>
+  <p class="kicker">Assignment A</p>
+  <h1>Cheerio Assist</h1>
+  <p class="who">Divyanshu</p>
+  <p>I took the support problem. Most Cheerio users are owners and marketers, not people who want to learn what a WABA is. The queue grows because a failed send is written in Meta’s language and the person staring at it just wanted the message to go out.</p>
+  <p>I read Cheerio’s own pages before I picked a solution: how to make a template, how to connect WhatsApp, what a workflow node is, and the pricing page. The steps are already there. A longer help center is not the gap. The gap is the campaign that says Failed at 9:14 in the morning.</p>
+
+  <h2>Who this is for, and the five I would take first</h2>
+  <p>The person who holds the login on Startup or Growth. Those plans are ₹1,999 and ₹4,999. They are usually doing this themselves. The brands Cheerio names, IndiaMART and IndusInd, already have someone. They are not why support hiring breaks. I would spend the quarter on the long tail, on the path to the first message that actually arrives.</p>
+  <ol>
+    <li><strong>Template rejected.</strong> Cheerio’s guide says the name is lowercase with no spaces, and nothing sends until Meta approves it. People still submit “Diwali Offer” and mark a discount as Utility, because Utility sounds like the serious, cheaper one. The rule is known. The product can prepare the correction.</li>
+    <li><strong>WhatsApp setup stuck.</strong> The number cannot already be on the WhatsApp app, the person has to be a Facebook admin, and an on-hold health check already goes to a human. I can show which step is open. I cannot make someone an admin.</li>
+    <li><strong>The workflow did not reply.</strong> The toggle is off, the keyword does not match what the guest typed, or the template is not approved. If the flow itself is wrong, that stays with a person. I am not going to “build the bot” from a sentence.</li>
+    <li><strong>The campaign did not send.</strong> Usually the same template. The useful thing is to show the status, not to ask the owner to describe it.</li>
+    <li><strong>Why was I charged.</strong> I kept this separate on purpose. Pointing at a debit is fine. A refund is not. I only count about 10% of these as resolved, so the model cannot hide a refund bot inside a nice percentage. From 1 October 2026 Meta also charges service messages and utility messages inside the 24-hour window. Owners will read that as a Cheerio fee. The screen has to say who charged them. I am not putting a made-up rupee rate on it.</li>
+  </ol>
+  <p>Integrations are sixth, and only the case where nothing is connected. Guessing at Shopify’s error is how you create a second ticket.</p>
+
+  <h2>What I considered, and the one I kept</h2>
+  <p>My first answer was a chatbot on the help center. I threw it out. It can define a template. It cannot say “Diwali Offer was rejected because the name has a space, the category is Utility, and the variable is empty.” That is the actual ticket.</p>
+  <table>
+    <tr><th>I also looked at</th><th>Why I left it</th></tr>
+    <tr><td>Hiring</td><td>That is the problem in the brief.</td></tr>
+    <tr><td>More videos</td><td>The steps are already published. People ticket next to an open dashboard.</td></tr>
+    <tr><td>A product tour</td><td>Tours teach the happy path. These tickets are the failed one.</td></tr>
+    <tr><td>Blocking a bad template in the builder</td><td>I do want this, in month 2. It stops the next mistake. It does nothing for the one that failed this morning.</td></tr>
+    <tr><td>An alert with no fix</td><td>Another notification.</td></tr>
+    <tr><td>More onboarding calls</td><td>Growth already includes 4 a month, Pro includes 10. Calls do not cover 5,000 businesses.</td></tr>
+    <tr><td>A forum</td><td>An owner is not going to browse one between a guest and a send.</td></tr>
+  </table>
+  <p>I ranked by three things I could actually defend: how many tickets, whether the fix is a rule, and how bad a wrong edit is. Templates pass. Money and third-party errors fail the third, so a person keeps them. What I am shipping is a fix on the failed object. The builder guard is the same bet, shipped second.</p>
+
+  <h2>What Assist does</h2>
+  <p>It opens on the campaign, template, or wallet line that failed. The diagnosis is already written. I should not have to think of a question. It reads a short list: template status, category, name, whether the variable has an example, workflow toggle, keyword, last error. It shows the before and after. Nothing is saved until the button is pressed.</p>
+  <p>The edits I would allow in the first version are small. A valid template name. Marketing or Utility, only when the text and the category disagree. An example for a variable. Turning a workflow on. Opening the setup step that is still empty. One resubmit to Meta. If that comes back rejected, Assist stops. A person is on the same screen, and the ticket they receive already has the workspace, the plan, the campaign id, and what was already tried.</p>
+  <p>It does not send the campaign. The campaign stays paused until I send it, after Meta approves the template. It does not touch the wallet, the plan, or who can log in. It does not rebuild a workflow. It does not tell Meta to approve anything. It is also not the AI agent Cheerio sells to answer Hotel Amar’s guests. That product talks to guests. This one talks to me.</p>
+
+  <h2>When a person still has to step in</h2>
+  <p>I asked. The error is not in those playbooks. The same fix already failed once. The blocker is outside Cheerio: Facebook admin, a number still on the WhatsApp app, verification on hold, documents. The topic is money. The action would send, delete, or change login. The point of the handoff is that the agent starts from the diagnosis. Today they start from “please describe your issue,” which is the sentence I could not write in the first place.</p>
+
+  <h2>How I would know it worked</h2>
+  <p>Three numbers, and one I would put on a wall.</p>
+  <p>Closed with no human, and still closed seven days later. A session only counts if no ticket opens on that issue within the week. Repeat contact within seven days, with an alert at 12%. If a playbook crosses it, the button comes off and the explanation stays. Time from signup to the first delivered message on a new workspace. That is the owner’s outcome. Ticket count is ours. I am not using CSAT this quarter. A polite wrong answer scores well and still comes back on Monday. That was a metric I had in an early draft and removed.</p>
+  <p>The wall number is <strong>human tickets per 100 active businesses per month.</strong> A resolution rate can look fine while the team is drowning, if you only count easy chats or if the logo count grows. This one has the base on the bottom.</p>
+  <p>With the blue cells in the sheet: about <strong>111 today, about 74 in month 3, a 34% drop.</strong> I am not aiming at the ceiling. If every query opened Assist, the playbooks I trust still leave the hard half with a person. I assumed 70% of queries even reach the panel by month 3. The rest still arrive by email or a WhatsApp to support.</p>
+  <p>Month 1 is only the failed campaign, the template behind it, and the charge question on that same screen. About a 12% drop. If I don’t see something close to 10%, I do not start setup. I fix that screen. Month 2 adds WhatsApp setup, about 21%. Month 3 adds workflows, about 34%. Charge questions are visible from month 1 and almost none of them count as resolved. I did that on purpose.</p>
+
+  <h2>The numbers, and the part I got wrong first</h2>
+  <p>5,000 businesses. I split them instead of using one average: people setting up or adding a channel, 20%, at 2.5 queries; people using it weekly, 65%, at 1 query; people who barely log in, 15%, at 0.4. That is about <strong>6,050 queries a month</strong>. A loaded agent at ₹48,000 finishing 220 how-to tickets is <strong>₹218 a ticket</strong>. The salary is a guess. It is a blue cell because I don’t have Cheerio’s payroll. If the real number is ₹35,000 or ₹55,000, the sheet moves.</p>
+  <p>For the model I used gpt-4o-mini. OpenAI’s page on 12 Oct 2026: $0.15 input, $0.075 cached input, $0.60 output, per million tokens. The rupee that morning was about 95.8. A session is about <strong>₹0.06</strong>. The month’s token bill is a few hundred rupees. I nearly stopped there and called the project free to run. That was the weak answer. The person who keeps the playbooks honest is ₹55,000, hosting and logs are ₹15,000, and the agents we still need are the rest. Support goes from about <strong>₹12.1 lakh to ₹8.7 lakh</strong>. About <strong>₹3.4 lakh a month</strong> back, roughly ₹4.80 for each rupee spent on Assist. The same queries Assist closes would have cost about ₹4.8 lakh with agents.</p>
+  <p>I don’t want to charge for the fix. Not per conversation, not credits, not an add-on. The owner is already paying, and Growth’s 4 calls and Pro’s 10 already cover a person. A meter teaches people to skip Assist and message support, which is the expensive path. I still ran the other case, because the token math makes a fee look clever. ₹49 per resolution, adoption down from 70% to 35%. The fee does not cover the playbook owner, and the company keeps about <strong>₹1.5 lakh less</strong> than giving Assist away. The first version of that block only looked at tokens, so the margin looked healthy. It was wrong until I put the returning tickets back in.</p>
+  <p>Once a month, and a lighter look every Monday: the OpenAI invoice within 15% of the logs; repeat rate by playbook; 30 resolved sessions read properly, and one wrong edit takes that button off the same day; a test that Assist never called wallet, plan, or send. I would not cut headcount until tickets per 100 businesses actually fall. An alert in a channel nobody opens is not an audit.</p>
+
+  <h2>What I built</h2>
+  <p>One path, on Hotel Amar’s Growth workspace, with me as the owner. Diwali weekend rooms, 1,240 guests, failed. Assist shows the name, Utility on a discount, and a blank variable. I can resubmit. The campaign stays paused. If I switch the category back to Utility, or clear the example, or put a space in the name, the button dies. If Meta rejects the second time, it stops. The ₹840 on 2 Oct is Monsoon rates, a different campaign, and Assist will not move that money. The ticket that goes to a person already has the campaign id on it.</p>
+  <p>https://cheerio-assist-hotel-amar.vercel.app</p>
+
+  <h2>Where AI helped, and where I had to throw the answer out</h2>
+  <p>I used Cursor while I did this. The part I care about is what I refused.</p>
+  <p>The prompt that failed was the wide one: top five queries, a chatbot, and a price per conversation. What came back was a docs bot, a CSAT target, and a fee. I also got a search summary that put a rupee sign on Meta’s India rate card. Those figures are dollars. A marketing message in India is about $0.0118, not ₹0.0118. I checked the shape of the rate, not the summary, and left message rates out of the sheet. Assist does not send those messages. A wrong unit in a margin calculation would have been embarrassing in a review, and it would have been my fault for pasting it.</p>
+  <p>Three narrower prompts actually changed the work. One was to stay on Cheerio’s own template, onboarding, and workflow pages and not invent ticket counts. One was to put the person who maintains the playbooks in the bill, then show what happens to the company if a fee cuts usage in half. One was to build a single failed send, including the refund I am not allowed to give.</p>
+  <p>What I did not hand over: the salary, who is new versus who is quiet, the finish rate on each issue, and the rule that month 1 has to move tickets or I don’t add a second playbook. Those are my guesses. They are the blue cells. If a ticket export exists, replace them. The rest of the sheet will follow.</p>
+  <p class="end">Checked 12 Oct 2026: cheerio.ai/pricing, Cheerio’s template and WhatsApp setup guides, Cheerio’s note on Meta charging service and in-window utility messages from 1 Oct 2026, OpenAI’s gpt-4o-mini prices. USD/INR about 95.8 that morning. The volumes are a guesstimate.</p>
+</body>
+</html>
